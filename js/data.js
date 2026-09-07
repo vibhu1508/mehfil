@@ -275,8 +275,8 @@ export const FAQ = [
 export const SITE = {
   name: 'महफ़िल',
   nameEn: 'Mehfil',
-  curator: '[YOUR NAME]',
-  instagram: '[your_handle]',
+  curator: 'Vibhu Gupta',
+  instagram: 'VibhuGupta1508',
   shareText: 'Aaj raat ki mehfil — do peg, teen ghazal, subah tak.',
 
   /* Tracking params stripped. NOTE: this list id is 13 characters; YouTube
