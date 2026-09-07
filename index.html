@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>महफ़िल Mehfil — Ghazals for a late night baithak</title>
+<meta name="description" content="Purani baithak wali mehfil — ghazal, shayari aur raat bhar chalti baatein. Chaar peg, chaar playlist. Club-party nahi, mehfil.">
+<meta name="theme-color" content="#141110">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="महफ़िल Mehfil — do peg, teen ghazal, subah tak">
+<meta property="og:description" content="Ek raat, chaar peg, chaar playlist. Jaise-jaise raat gehri hoti hai, mehfil badalti hai.">
+<meta property="og:image" content="assets/still/pehla-peg.jpg">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="css/styles.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🥃</text></svg>">
+</head>
+<body>
+
+<!-- the room -->
+<div class="stage" id="stage" aria-hidden="true">
+  <img class="layer is-on" id="layerA" alt="" decoding="async" fetchpriority="high">
+  <img class="layer"       id="layerB" alt="" decoding="async">
+  <div class="scrim"></div>
+</div>
+
+<a class="skip" href="#tracklist">Seedha tracklist par jao</a>
+
+<div class="shell">
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="dv brand-name">महफ़िल</span>
+    </div>
+    <div class="topbar-end">
+      <button class="btn btn-sm" type="button" data-share="whatsapp">Share</button>
+    </div>
+  </header>
+
+  <main class="stage-copy">
+    <p class="kicker dv" id="kicker">आज रात की महफ़िल</p>
+    <h1 class="headline" id="headline"></h1>
+    <p class="tagline" id="tagline"></p>
+    <div class="cta">
+      <button class="btn btn-lg" type="button" id="startBtn">
+        <span class="ico-play" aria-hidden="true"></span><span id="startLabel">Mehfil shuru karo</span>
+      </button>
+      <button class="btn btn-lg btn-ghost" type="button" data-open="tracklist">Poori tracklist</button>
+    </div>
+
+    <figure class="sher" id="sherCard">
+      <blockquote class="dv" id="sherText"></blockquote>
+      <figcaption class="dv" id="sherPoet"></figcaption>
+      <div class="sher-actions">
+        <button class="chip chip-sm" type="button" id="sherScript">हिंदी में</button>
+        <button class="chip chip-sm" type="button" id="sherFull" hidden data-open="sher">Poora sher</button>
+        <button class="chip chip-sm" type="button" id="sherCopy">Copy sher</button>
+        <button class="chip chip-sm" type="button" id="sherNext">Agla &rarr;</button>
+      </div>
+    </figure>
+  </main>
+
+  <aside class="controls" aria-label="Player aur tracklist">
+
+    <section class="panel panel-dial">
+      <h2 class="panel-h">Raat kitni ho chuki hai?</h2>
+      <div class="dial" id="dial" role="group" aria-label="Peg chuno"></div>
+      <p class="hint" id="dialHint"></p>
+    </section>
+
+    <section class="panel panel-player" aria-label="Player">
+      <div class="np">
+        <div class="np-art" id="npArt" aria-hidden="true"></div>
+        <div class="np-meta">
+          <p class="np-label">Ab baj raha hai</p>
+          <p class="np-title" id="npTitle">—</p>
+          <p class="np-artist" id="npArtist"></p>
+        </div>
+      </div>
+      <div class="seek">
+        <span class="t" id="tNow">0:00</span>
+        <input class="bar" id="seek" type="range" min="0" max="1000" value="0" step="1" aria-label="Gaane mein aage-peeche jao">
+        <span class="t" id="tEnd">0:00</span>
+      </div>
+      <div class="transport">
+        <button class="ctl" type="button" id="prevBtn" aria-label="Pichhla gaana"><span class="ico-prev"></span></button>
+        <button class="ctl ctl-main" type="button" id="playBtn" aria-label="Chalao"><span class="ico-play" id="playIco"></span></button>
+        <button class="ctl" type="button" id="nextBtn" aria-label="Agla gaana"><span class="ico-next"></span></button>
+        <button class="chip chip-sm" type="button" id="shuffleBtn" aria-pressed="false">Shuffle</button>
+        <span class="grow"></span>
+        <a class="ytm" id="ytLink" hidden target="_blank" rel="noopener"
+           title="Poori playlist YouTube Music par kholo">
+          <svg class="ytm-logo" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <circle cx="12" cy="12" r="11" fill="#ff0033"/>
+            <path d="M9.8 7.6 L16.6 12 L9.8 16.4 Z" fill="#fff"/>
+          </svg>
+          <span>YouTube Music</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="panel panel-list" id="tracklist" aria-label="Tracklist">
+      <div class="list-head">
+        <h2 class="panel-h" id="listTitle">—</h2>
+        <div class="filters" id="filters" role="group" aria-label="Chhaanto"></div>
+      </div>
+      <ol class="tracks" id="tracks"></ol>
+      <p class="hint list-hint">Sirf ye list scroll hoti hai — page nahi.</p>
+    </section>
+
+    <section class="panel panel-curator">
+      <div class="cur-avatar" aria-hidden="true"></div>
+      <div class="cur-meta">
+        <p class="cur-name">Sajayi hai <span id="curator"></span> ne</p>
+        <a class="cur-ig" id="igLink" target="_blank" rel="noopener"></a>
+      </div>
+    </section>
+
+  </aside>
+
+  <footer class="bottombar">
+    <div class="share">
+      <span class="live" id="live" hidden>
+        <span class="live-dot" aria-hidden="true"></span>
+        <span id="liveText"></span>
+      </span>
+      <span class="share-line">Akela peene ka koi maza nahi &rarr;</span>
+      <button class="btn btn-sm" type="button" data-share="whatsapp">WhatsApp</button>
+      <button class="chip chip-sm" type="button" data-share="copy" id="copyBtn">Link copy karo</button>
+    </div>
+    <div class="foot-links">
+      <button class="linkish only-mobile" type="button" data-open="sher">Aaj ka sher</button>
+      <button class="linkish" type="button" data-open="faq">FAQ</button>
+      <button class="linkish" type="button" data-open="about">About</button>
+      <span class="warn">Sambhal ke &middot; 21+</span>
+    </div>
+  </footer>
+
+</div>
+
+<!-- overlays -->
+<dialog class="sheet" id="dlg-tracklist">
+  <div class="sheet-head">
+    <h2 id="dlgListTitle">Poori tracklist</h2>
+    <button class="x" type="button" data-close aria-label="Band karo">&times;</button>
+  </div>
+  <div class="sheet-body"><ol class="tracks tracks-full" id="tracksFull"></ol></div>
+</dialog>
+
+<dialog class="sheet" id="dlg-sher">
+  <div class="sheet-head">
+    <h2>Aaj ka sher</h2>
+    <button class="x" type="button" data-close aria-label="Band karo">&times;</button>
+  </div>
+  <div class="sheet-body">
+    <figure class="sher sher-in-sheet">
+      <blockquote class="dv" id="sherTextM"></blockquote>
+      <figcaption class="dv" id="sherPoetM"></figcaption>
+      <div class="sher-actions">
+        <button class="chip chip-sm" type="button" id="sherScriptM">हिंदी में</button>
+        <button class="chip chip-sm" type="button" id="sherCopyM">Copy sher</button>
+        <button class="chip chip-sm" type="button" id="sherNextM">Agla &rarr;</button>
+      </div>
+    </figure>
+  </div>
+</dialog>
+
+<dialog class="sheet" id="dlg-faq">
+  <div class="sheet-head">
+    <h2>Sawaal-jawaab</h2>
+    <button class="x" type="button" data-close aria-label="Band karo">&times;</button>
+  </div>
+  <div class="sheet-body"><dl class="faq" id="faqList"></dl></div>
+</dialog>
+
+<dialog class="sheet" id="dlg-about">
+  <div class="sheet-head">
+    <h2>Ye kya hai</h2>
+    <button class="x" type="button" data-close aria-label="Band karo">&times;</button>
+  </div>
+  <div class="sheet-body" id="aboutBody"></div>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div id="yt-host" aria-hidden="true"></div>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
