@@ -248,6 +248,8 @@ ol{list-style:none;padding:0}
 /* live listeners */
 .live{display:inline-flex;align-items:center;gap:7px;font-size:12px;color:var(--ink-2);
   white-space:nowrap}
+.live-total{color:var(--ink-3)}
+.live-total:not(:empty)::before{content:'·';margin:0 6px;color:var(--line)}
 .live-dot{width:7px;height:7px;border-radius:50%;background:#5fbf6a;flex:none;
   box-shadow:0 0 0 0 rgba(95,191,106,.6);animation:pulse 2.4s ease-out infinite}
 @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(95,191,106,.55)}
@@ -333,6 +335,7 @@ ol{list-style:none;padding:0}
   .stage-copy{max-height:42dvh}
   .bottombar{height:auto;min-height:64px;padding:8px 12px;gap:10px;flex-wrap:wrap}
   .share-line{display:none}
+  .live-total{display:none}          /* live count only, the bar is tight */
   .foot-links{gap:11px}
   .sheet{width:96vw;max-height:88dvh}
 }

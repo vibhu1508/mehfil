@@ -137,6 +137,7 @@
       <span class="live" id="live" hidden>
         <span class="live-dot" aria-hidden="true"></span>
         <span id="liveText"></span>
+        <span class="live-total" id="totalText"></span>
       </span>
       <span class="share-line">Akela peene ka koi maza nahi &rarr;</span>
       <button class="btn btn-sm" type="button" data-share="whatsapp">WhatsApp</button>
@@ -214,5 +215,9 @@
 <div id="yt-host" aria-hidden="true"></div>
 
 <script type="module" src="js/app.js"></script>
+
+<!-- Vercel Web Analytics. Only serves once deployed on Vercel AND enabled at
+     Project - Analytics - Enable. It 404s on localhost; that is expected. -->
+<script defer src="/_vercel/insights/script.js"></script>
 </body>
 </html>

@@ -11,8 +11,21 @@ const MAX = 50_000;         // hard cap, so a flood cannot grow the map forever
 
 export class Presence {
   constructor(state) {
-    this.seen = new Map();          // id -> lastSeen ms
+    this.state = state;
+    this.seen = new Map();          // id -> lastSeen ms   (live, in memory)
     this.pegs = new Map();          // id -> peg id
+    this.totals = null;             // { views, visitors }  (persisted)
+  }
+
+  /* Durable Objects can be evicted, so read the totals back from storage the
+   * first time they are needed rather than trusting memory. */
+  async loadTotals() {
+    if (this.totals) return this.totals;
+    this.totals = {
+      views:    (await this.state.storage.get('views'))    || 0,
+      visitors: (await this.state.storage.get('visitors')) || 0
+    };
+    return this.totals;
   }
 
   prune(now) {
@@ -28,6 +41,8 @@ export class Presence {
     const leave = url.searchParams.get('leave');
     if (leave) { this.seen.delete(leave); this.pegs.delete(leave); }
 
+    const totals = await this.loadTotals();
+
     if (req.method === 'POST' && !leave) {
       let body = {};
       try { body = await req.json(); } catch {}
@@ -35,6 +50,17 @@ export class Presence {
       if (id && this.seen.size < MAX) {
         this.seen.set(id, now);
         if (typeof body.peg === 'string') this.pegs.set(id, body.peg.slice(0, 24));
+      }
+
+      // `visit` is sent once per page load, `returning` when the browser has
+      // been here before — so views counts opens, visitors counts people.
+      if (body.visit) {
+        totals.views += 1;
+        await this.state.storage.put('views', totals.views);
+        if (!body.returning) {
+          totals.visitors += 1;
+          await this.state.storage.put('visitors', totals.visitors);
+        }
       }
     }
 
@@ -44,7 +70,12 @@ export class Presence {
     const byPeg = {};
     for (const peg of this.pegs.values()) byPeg[peg] = (byPeg[peg] || 0) + 1;
 
-    return Response.json({ count: this.seen.size, byPeg });
+    return Response.json({
+      count: this.seen.size,        // here right now
+      views: totals.views,          // page opens, all time
+      visitors: totals.visitors,    // distinct browsers, all time
+      byPeg
+    });
   }
 }
 

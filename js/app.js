@@ -254,6 +254,11 @@ async function play(i) {
   const t = state.queue[state.idx];
   yt.loadVideoById(t.yt);
   yt.playVideo();
+  // clear the old song's clock straight away — otherwise the previous
+  // duration lingers on screen until the next progress tick
+  $('#tNow').textContent = '0:00';
+  $('#tEnd').textContent = '0:00';
+  $('#seek').value = 0;
   paintNowPlaying();
   renderList();
 }
@@ -411,21 +416,41 @@ function startPresence() {
   const box = $('#live'), txt = $('#liveText');
   if (!url) { box.hidden = true; return; }
 
-  const me = (crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2));
-  let misses = 0;
+  const rnd = () => (crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2));
+  const me = rnd();                       // this tab, for the live count
+  const total = $('#totalText');
+
+  /* A first-party id kept in this browser only, so a return visit is not
+   * counted as a new person. No cookie, nothing shared with anyone else. */
+  let returning = false;
+  try {
+    returning = !!localStorage.getItem('mehfil.vid');
+    if (!returning) localStorage.setItem('mehfil.vid', rnd());
+  } catch { returning = false; }
+
+  let misses = 0, firstBeat = true;
 
   const beat = async () => {
     try {
       const r = await fetch(url, {
         method: 'POST', headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ id: me, peg: state.peg.id })
+        body: JSON.stringify({
+          id: me, peg: state.peg.id,
+          visit: firstBeat || undefined,     // counted once per page load
+          returning: returning || undefined
+        })
       });
       if (!r.ok) throw new Error(r.status);
-      const { count } = await r.json();
-      if (typeof count !== 'number' || count < 1) throw new Error('bad payload');
-      txt.textContent = count === 1
-        ? 'Abhi tum akele ho'
-        : `${count.toLocaleString('en-IN')} log baithe hain`;
+      const d = await r.json();
+      if (typeof d.count !== 'number' || d.count < 1) throw new Error('bad payload');
+      firstBeat = false;
+
+      txt.textContent = d.count === 1
+        ? 'Sirf teri mehfil chal rahi hai'
+        : `${d.count.toLocaleString('en-IN')} mehfilein chal rahi hain`;
+      total.textContent = d.visitors > 1
+        ? `${d.visitors.toLocaleString('en-IN')} aa chuke hain`
+        : '';
       box.hidden = false;
       misses = 0;
     } catch {
