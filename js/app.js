@@ -35,8 +35,8 @@ let live = 0;
 let pending = null;   // the url the most recent request is working towards
 
 const bgFor = peg => MOBILE.matches
-  ? `assets/still/mobile/${peg.slug}.jpg`
-  : `assets/still/${peg.slug}.jpg`;
+  ? `/assets/still/mobile/${peg.slug}.jpg`
+  : `/assets/still/${peg.slug}.jpg`;
 
 function paintRoom(peg, immediate = false) {
   const url = bgFor(peg);
@@ -171,7 +171,9 @@ function renderPeg(immediate = false) {
   $('#headline').innerHTML = p.headline.map(l => `<span>${l}</span>`).join('<br>');
   $('#tagline').textContent = p.tagline;
   $('#dialHint').textContent = `${p.clock} · ${p.tagline}`;
-  document.title = `${p.dv} — महफ़िल Mehfil`;
+  // the generated pages carry their own SEO title — only rewrite it once the
+  // visitor actually changes peg, never on first paint
+  if (!immediate) document.title = `${p.dv} — महफ़िल Mehfil`;
   $$('#dial .peg').forEach(b => b.setAttribute('aria-pressed', b.dataset.peg === p.id));
   paintRoom(p, immediate);
   state.sher = 0;
@@ -187,7 +189,7 @@ function setPeg(id) {
   state.peg = p;                       // note: playback carries on untouched
   state.filter = 'all';
   renderPeg();
-  history.replaceState(null, '', '#' + p.slug);
+  history.replaceState(null, '', '/' + p.slug + '/');   // real URL, real page
 }
 
 /* ---------------- queue ---------------- */
@@ -505,8 +507,18 @@ function boot() {
 
   if (SITE.ytMusicPlaylist) { const l = $('#ytLink'); l.href = SITE.ytMusicPlaylist; l.hidden = false; }
 
-  const fromHash = PEGS.find(p => p.slug === location.hash.slice(1));
-  state.peg = fromHash || pegNow();
+  /* build.mjs stamps each generated page with its route, so /teesra-peg/ opens
+   * on teesra and /sharaabi/ opens on that category. Falls back to the clock. */
+  const route = (document.querySelector('meta[name="mehfil-route"]')?.content || '').split('|');
+  const fromRoute = PEGS.find(p => p.id === route[0]);
+  const fromHash  = PEGS.find(p => p.slug === location.hash.slice(1));
+  state.peg = fromRoute || fromHash || pegNow();
+
+  const catSlug = route[1];
+  if (catSlug) {
+    const f = FILTERS.find(x => x.label.toLowerCase().replace(/\s+/g, '-') === catSlug);
+    if (f) state.filter = f.id;
+  }
 
   renderDial(); renderFilters(); renderPeg(true);
   paintTransport();

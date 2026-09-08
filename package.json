@@ -1,5 +1,9 @@
 {
   "devDependencies": {
     "playwright": "^1.63.0"
+  },
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs"
   }
 }

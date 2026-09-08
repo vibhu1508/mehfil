@@ -387,7 +387,7 @@ export const SITE = {
   /* You */
   curator: 'Vibhu Gupta',
   role: 'AI Engineer',
-  photo: 'assets/vibhu.jpg',        // 256px web copy of assets/vibhu.jpeg
+  photo: '/assets/vibhu.jpg',        // 256px web copy of assets/vibhu.jpeg
   x: 'VibhuGupta1508',
   portfolio: '[https://your-portfolio-url]',   // <-- paste your portfolio link
   whatsapp: 'https://chat.whatsapp.com/HukkXRYTpF0HkcVaKc7LTE',
