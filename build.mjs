@@ -11,6 +11,7 @@ import path from 'node:path';
 import { PEGS, FILTERS, TRACKS, SHERS, SITE } from './js/data.js';
 
 const ORIGIN = 'https://raatkimehfil.xyz';
+const OUT = 'dist';   // everything the site needs, and nothing else
 const esc = t => String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;')
   .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
@@ -58,9 +59,22 @@ function page({ slug, title, desc, h1, kicker, list, peg }) {
   return h;
 }
 
+/* Start clean, then copy in only what the live site actually loads. Source
+ * material (full-size stills, raw video, wireframes, docs) never gets here. */
+fs.rmSync(OUT, { recursive: true, force: true });
+fs.mkdirSync(OUT, { recursive: true });
+for (const dir of ['css', 'js']) fs.cpSync(dir, path.join(OUT, dir), { recursive: true });
+fs.mkdirSync(path.join(OUT, 'assets/still/mobile'), { recursive: true });
+for (const f of fs.readdirSync('assets/still').filter(f => f.endsWith('.jpg')))
+  fs.copyFileSync(path.join('assets/still', f), path.join(OUT, 'assets/still', f));
+for (const f of fs.readdirSync('assets/still/mobile').filter(f => f.endsWith('.jpg')))
+  fs.copyFileSync(path.join('assets/still/mobile', f), path.join(OUT, 'assets/still/mobile', f));
+if (fs.existsSync('assets/vibhu.jpg'))
+  fs.copyFileSync('assets/vibhu.jpg', path.join(OUT, 'assets/vibhu.jpg'));
+
 const written = [];
 function write(slug, html) {
-  const dir = slug ? path.join('.', slug) : '.';
+  const dir = slug ? path.join(OUT, slug) : OUT;
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(path.join(dir, 'index.html'), html);
   written.push(slug ? `/${slug}/` : '/');
@@ -98,14 +112,14 @@ for (const f of FILTERS) {
     h1: `${f.label} mehfil`, kicker: 'महफ़िल' }));
 }
 
-fs.writeFileSync('sitemap.xml',
+fs.writeFileSync(path.join(OUT, 'sitemap.xml'),
 `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${written.map(u => `  <url><loc>${ORIGIN}${u}</loc><changefreq>weekly</changefreq><priority>${u==='/'?'1.0':'0.8'}</priority></url>`).join('\n')}
 </urlset>
 `);
-fs.writeFileSync('robots.txt', `User-agent: *\nAllow: /\n\nSitemap: ${ORIGIN}/sitemap.xml\n`);
+fs.writeFileSync(path.join(OUT, 'robots.txt'), `User-agent: *\nAllow: /\n\nSitemap: ${ORIGIN}/sitemap.xml\n`);
 
-console.log(`built ${written.length} pages:`);
+console.log(`built ${written.length} pages into ${OUT}/:`);
 written.forEach(u => console.log('  ' + u));
 console.log('  + sitemap.xml, robots.txt');
