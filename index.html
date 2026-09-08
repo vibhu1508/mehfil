@@ -10,7 +10,12 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="महफ़िल Mehfil — do peg, teen ghazal, subah tak">
 <meta property="og:description" content="Ek raat, chaar peg, chaar playlist. Jaise-jaise raat gehri hoti hai, mehfil badalti hai.">
-<meta property="og:image" content="assets/still/pehla-peg.jpg">
+<meta property="og:image" content="https://raatkimehfil.xyz/assets/still/pehla-peg.jpg">
+<meta property="og:image:width" content="1600">
+<meta property="og:image:height" content="893">
+<meta property="og:url" content="https://raatkimehfil.xyz/">
+<meta property="og:site_name" content="महफ़िल Mehfil">
+<link rel="canonical" href="https://raatkimehfil.xyz/">
 <meta name="twitter:card" content="summary_large_image">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -110,15 +115,19 @@
         <div class="filters" id="filters" role="group" aria-label="Chhaanto"></div>
       </div>
       <ol class="tracks" id="tracks"></ol>
-      <p class="hint list-hint">Sirf ye list scroll hoti hai — page nahi.</p>
     </section>
 
     <section class="panel panel-curator">
-      <div class="cur-avatar" aria-hidden="true"></div>
+      <img class="cur-avatar" id="curPhoto" alt="" hidden>
+      <span class="cur-avatar cur-avatar-blank" id="curBlank" aria-hidden="true"></span>
       <div class="cur-meta">
         <p class="cur-name">Sajayi hai <span id="curator"></span> ne</p>
-        <a class="cur-ig" id="igLink" target="_blank" rel="noopener"></a>
+        <p class="cur-role" id="curRole"></p>
       </div>
+      <a class="icon-link" id="xLink" target="_blank" rel="noopener" title="X par follow karo">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        <span>VibhuGupta1508</span>
+      </a>
     </section>
 
   </aside>
@@ -134,6 +143,7 @@
       <button class="chip chip-sm" type="button" data-share="copy" id="copyBtn">Link copy karo</button>
     </div>
     <div class="foot-links">
+      
       <button class="linkish only-mobile" type="button" data-open="sher">Aaj ka sher</button>
       <button class="linkish" type="button" data-open="faq">FAQ</button>
       <button class="linkish" type="button" data-open="about">About</button>
@@ -184,6 +194,20 @@
     <button class="x" type="button" data-close aria-label="Band karo">&times;</button>
   </div>
   <div class="sheet-body" id="aboutBody"></div>
+  <div class="sheet-foot">
+    <div class="maker">
+      <img class="maker-photo" id="aboutPhoto" alt="" hidden>
+      <div>
+        <p class="maker-name" id="aboutName"></p>
+        <p class="maker-role" id="aboutRole"></p>
+      </div>
+    </div>
+    <div class="maker-links">
+      <a class="btn btn-sm" id="waLink" target="_blank" rel="noopener">WhatsApp community join karo</a>
+      <a class="btn btn-sm btn-ghost" id="portfolioLink" target="_blank" rel="noopener">Portfolio</a>
+      <a class="btn btn-sm btn-ghost" id="xLinkAbout" target="_blank" rel="noopener">VibhuGupta1508</a>
+    </div>
+  </div>
 </dialog>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>

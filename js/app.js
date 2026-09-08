@@ -117,20 +117,27 @@ function trackRow(t, i, n, attr = 'data-play') {
     </li>`;
 }
 
-function renderList() {
-  const all = LIB[state.peg.id] || [];
-  state.view = state.filter === 'all' ? all : all.filter(t => (t.tags || []).includes(state.filter));
+/* "Sab" means the mehfil — party tracks are deliberately excluded from it and
+ * live behind their own tab, so the default listen stays on-concept. */
+function visibleFor(pegId, filter) {
+  const all = LIB[pegId] || [];
+  return filter === 'all'
+    ? all.filter(t => !(t.tags || []).includes('party'))
+    : all.filter(t => (t.tags || []).includes(filter));
+}
 
-  const playable = state.view.filter(t => t.yt).length;
-  $('#listTitle').textContent = `${state.peg.en} · ${state.view.length} songs`;
-  $('#tracks').innerHTML = state.view.length
+function renderList() {
+  state.view = visibleFor(state.peg.id, state.filter);
+  const n = state.view.length;
+
+  $('#listTitle').textContent    = `${state.peg.en} · ${n} songs`;
+  $('#dlgListTitle').textContent = `${state.peg.en} · ${n} songs`;
+
+  $('#tracks').innerHTML = n
     ? state.view.map((t, i) => trackRow(t, i, i + 1)).join('')
     : `<li class="hint" style="padding:14px 0">Is filter mein abhi kuch nahi.</li>`;
-  $('#tracksFull').innerHTML = all.map((t, i) => trackRow(t, i, i + 1, 'data-full')).join('');
-  $('#dlgListTitle').textContent = `${state.peg.en} · ${all.length} songs`;
-
-  $('#startLabel').textContent = playable ? 'Mehfil shuru karo' : 'Abhi gaane nahi hain';
-  $('#startBtn').disabled = !playable;
+  $('#tracksFull').innerHTML = state.view.map((t, i) => trackRow(t, i, i + 1, 'data-full')).join('');
+  // the button label is paintTransport's job — it knows what is playing
 }
 
 function renderSher() {
@@ -186,7 +193,7 @@ function setPeg(id) {
 /* ---------------- queue ---------------- */
 
 const queueFor = pegId => {
-  const all = (LIB[pegId] || []).filter(t => t.yt);
+  const all = visibleFor(pegId, state.filter).filter(t => t.yt);
   return state.shuffle ? shuffled(all) : all;
 };
 
@@ -275,7 +282,7 @@ function paintTransport() {
   $('#playBtn').setAttribute('aria-label', state.playing ? 'Rok do' : 'Chalao');
 
   const here    = state.playingPeg === state.peg.id;
-  const canPlay = (LIB[state.peg.id] || []).some(t => t.yt);
+  const canPlay = visibleFor(state.peg.id, state.filter).some(t => t.yt);
   const btn     = $('#startBtn');
 
   $('#startLabel').textContent =
@@ -437,9 +444,35 @@ function startPresence() {
 
 function boot() {
   $('#curator').textContent = SITE.curator;
-  const ig = $('#igLink');
-  ig.textContent = '@' + SITE.instagram;
-  ig.href = 'https://instagram.com/' + SITE.instagram;
+  $('#curRole').textContent = SITE.role || '';
+  $('#aboutName').textContent = SITE.curator;
+  $('#aboutRole').textContent = SITE.role || '';
+
+  const xUrl = 'https://x.com/' + String(SITE.x || '').replace(/^@/, '');
+  for (const id of ['#xLink', '#xLinkAbout']) {
+    const el = $(id); if (!el) continue;
+    el.href = xUrl;
+    el.title = 'X — @' + String(SITE.x || '').replace(/^@/, '');
+  }
+  if (SITE.whatsapp) $('#waLink').href = SITE.whatsapp; else $('#waLink').hidden = true;
+
+  const port = $('#portfolioLink');
+  if (SITE.portfolio && !SITE.portfolio.startsWith('[')) port.href = SITE.portfolio;
+  else { port.href = '#'; port.setAttribute('aria-disabled', 'true'); port.title = 'Portfolio link abhi add karna hai'; }
+
+  // photo: curator panel + About sheet, both of which quietly stay blank if the
+  // file is missing
+  if (SITE.photo) {
+    const probe = new Image();
+    probe.onload = () => {
+      for (const img of [$('#curPhoto'), $('#aboutPhoto')]) {
+        img.src = SITE.photo; img.alt = SITE.curator; img.hidden = false;
+      }
+      $('#curBlank').hidden = true;
+    };
+    probe.onerror = () => console.info('no photo at ' + SITE.photo + ' yet — placeholders stay');
+    probe.src = SITE.photo;
+  }
 
   $('#faqList').innerHTML = FAQ.map(f => `<dt>${f.q}</dt><dd>${f.a}</dd>`).join('');
   $('#aboutBody').innerHTML =
@@ -462,7 +495,7 @@ function boot() {
   });
   $('#filters').addEventListener('click', e => {
     const b = e.target.closest('[data-filter]'); if (!b) return;
-    state.filter = b.dataset.filter; renderFilters(); renderList();
+    state.filter = b.dataset.filter; renderFilters(); renderList(); paintTransport();
   });
 
   const pick = t => { if (t && t.yt) playFrom(state.peg.id, t); };
@@ -473,7 +506,7 @@ function boot() {
   });
   $('#tracksFull').addEventListener('click', e => {
     const b = e.target.closest('[data-full]'); if (!b || b.disabled) return;
-    pick((LIB[state.peg.id] || [])[+b.dataset.full]);
+    pick(visibleFor(state.peg.id, state.filter)[+b.dataset.full]);
     $('#dlg-tracklist').close();
   });
 
